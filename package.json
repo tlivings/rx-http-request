@@ -1,6 +1,6 @@
 {
   "name": "rx-http-request",
-  "description": "",
+  "description": "Low level utility providing rxjs wrapping of node core http/https.",
   "version": "1.0.0",
   "author": "Trevor Livingston <tlivings@gmail.com>",
   "repository": {
