@@ -1,0 +1,29 @@
+{
+  "name": "rx-http-request",
+  "description": "",
+  "version": "1.0.0",
+  "author": "Trevor Livingston <tlivings@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/tlivings/rxhttpclient.git"
+  },
+  "bugs": "http://github.com/tlivings/rxhttpclient/issues",
+  "engines": {
+    "node": ">= 6.0.0"
+  },
+  "dependencies": {
+    "rxjs": "^5.0.0-rc.4"
+  },
+  "devDependencies": {
+    "eslint": "^3.11.0",
+    "istanbul": "^0.4.1",
+    "nock": "^9.0.2",
+    "tape": "^4.2.2"
+  },
+  "scripts": {
+    "test": "tape test/*.js",
+    "lint": "eslint index.js",
+    "cover": "istanbul cover tape -- test/*.js"
+  },
+  "main": "./index"
+}
