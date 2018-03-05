@@ -3,11 +3,10 @@
 
 
 const Test = require('tape');
-const { RxHttpRequest } = require('../index');
+const { RxHttpRequest, RxHttpsRequest } = require('../index');
 const Nock = require('nock');
-const { Observable } = require('rxjs');
 
-Test('test', (t) => {
+Test('test reading', (t) => {
 
     t.test('get', (t) => {
         t.plan(2);
@@ -20,8 +19,6 @@ Test('test', (t) => {
             path: '/hello'
         });
 
-        request.complete();
-
         request.flatMap((response) => response).toArray().map((chunks) => JSON.parse(Buffer.concat(chunks))).subscribe(
             (body) => {
                 t.equal(body.hello, 'hello world');
@@ -33,22 +30,21 @@ Test('test', (t) => {
                 t.pass();
             }
         );
+
+        request.complete();
     });
 
     t.test('post', (t) => {
         t.plan(2);
-
+    
         Nock('http://example.com').post('/hello', (body) => body === 'hello world').reply(200);
-
+    
         const request = new RxHttpRequest({
             method: 'POST',
             hostname: 'example.com',
             path: '/hello'
         });
-
-        request.next('hello world');
-        request.complete();
-
+    
         request.subscribe(
             (response) => {
                 t.equal(response.raw.statusCode, 200);
@@ -60,6 +56,36 @@ Test('test', (t) => {
                 t.pass();
             }
         );
+    
+        request.next('hello world');
+        request.complete();
+    });
+
+    t.test('error on writing request', (t) => {
+        t.plan(1);
+    
+        Nock('http://example.com').post('/hello', (body) => body === 'hello world').reply(200);
+    
+        const request = new RxHttpRequest({
+            method: 'POST',
+            hostname: 'example.com',
+            path: '/hello'
+        });
+    
+        request.subscribe(
+            (response) => {
+                t.fail();
+            },
+            (error) => {
+                t.pass();
+            },
+            () => {
+                t.fail();
+            }
+        );
+    
+        request.next('hello world');
+        request.error(new Error());
     });
 
 });

@@ -1,19 +1,21 @@
 # rx-http-request
 
-The intent of this module is to provide a low level utility providing `rxjs` wrapping of node core http/https 
-off of which higher level abstractions can be built. 
+The intent of this module is to provide a low level utility providing `rxjs` wrapping of node core http/https
+off of which higher level abstractions can be built.
 
-### API
+### Request API
 
 - `RxHttpRequest(options)` - a `Subject` wrapping `http.ClientRequest`.
-    - `raw` - the underlying `http.ClientRequest` object. 
+    - `raw` - the underlying `http.ClientRequest` object.
 
 - `RxHttpsRequest(options)` - a `Subject` wrapping `http.ClientRequest` for `https`.
     - `raw` - the underlying `http.ClientRequest` object.
 
 As subjects, `complete` must be called (similar to `end` on a request), to begin the request.
 
-As observables, they emit `RxReadable` observables.
+### Responses
+
+As observables, requests emit `RxReadable` observable responses.
 
 - `RxReadable` - an `Observable` wrapping `http.IncomingMessage`.
     - `raw` - the underlying `http.IncomingMessage`.
@@ -29,14 +31,12 @@ const request = new RxHttpRequest({
     path: '/hello'
 });
 
-request.complete();
-
 request
-//project the incoming response as an observable sequence
+//project the incoming response observable
 .flatMap((response) => response)
-//gather all data read off response
+//gather all data read off the response
 .toArray()
-//parse the body
+//parse the body (JSON in this case)
 .map((chunks) => JSON.parse(Buffer.concat(chunks)))
 .subscribe(
     (body) => {
@@ -49,4 +49,7 @@ request
         console.log('request complete');
     }
 );
+
+//Begins the request
+request.complete();
 ```

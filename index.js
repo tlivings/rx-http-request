@@ -4,6 +4,28 @@ const Http = require('http');
 const Https = require('https');
 const { Observable, Subscriber } = require('rxjs');
 
+class RxClientRequest extends Subscriber {
+    constructor(request) {
+        super(
+            (x) => {
+                request.write(x);
+            },
+            (error) => {
+                request.emit('error', error);
+            },
+            () => {
+                request.end();
+            }
+        );
+
+        this._raw = request;
+    }
+
+    get raw() {
+        return this._raw;
+    }
+}
+
 class RxReadable extends Observable {
     constructor(readable) {
         super((observer) => {
@@ -42,32 +64,26 @@ class RxReadable extends Observable {
     }
 }
 
-class RxClientRequest extends Subscriber {
-    constructor(request) {
-        super(
-            (x) => {
-                request.write(x);
-            },
-            () => {
-                request.abort();
-            },
-            () => {
-                request.end();
-            }
-        );
-
-        this._raw = request;
-    }
-
-    get raw() {
-        return this._raw;
-    }
-}
-
 class RxObservableRequest extends Observable {
     constructor(request) {
         super(
             (observer) => {
+                let _socket = undefined;
+
+                const onConnect = () => {
+                    //TODO: something
+                };
+
+                const onSecureConnect = () => {
+                    //TODO: something
+                };
+
+                const onSocket = (socket) => {
+                    _socket = socket;
+                    socket.on('connect', onConnect);
+                    socket.on('secureConnect', onSecureConnect);
+                };
+
                 const onResponse = (response) => {
                     observer.next(new RxReadable(response));
                     observer.complete();
@@ -77,10 +93,16 @@ class RxObservableRequest extends Observable {
                     observer.error(error);
                 }
 
+                request.on('socket', onSocket);
                 request.on('response', onResponse);
                 request.on('error', onError);
 
                 return () => {
+                    if (_socket) {
+                        _socket.removeListener('connect', onConnect);
+                        _socket.removeListener('secureConnect', onSecureConnect);
+                    }
+                    request.removeListener('socket', onSocket);
                     request.removeListener('response', onResponse);
                     request.removeListener('error', onError);
                 };
@@ -114,7 +136,7 @@ class RxHttpRequest extends RxObservableRequest {
     }
 }
 
-class RxHttpsRequest extends RxHttpRequest {
+class RxHttpsRequest extends RxObservableRequest {
     constructor(options = {}) {
         super(Https.request(options));
     }
