@@ -17,8 +17,8 @@ Test('test request creation', (t) => {
         });
 
         t.ok(request, 'request created.');
-        t.ok(request._raw, 'raw request created.');
-        request._raw.abort();
+        t.ok(request.raw, 'raw request created.');
+        request.raw.abort();
     });
 
     t.test('create https', (t) => {
@@ -31,8 +31,8 @@ Test('test request creation', (t) => {
         });
 
         t.ok(request, 'request created.');
-        t.ok(request._raw, 'raw request created.');
-        request._raw.abort();
+        t.ok(request.raw, 'raw request created.');
+        request.raw.abort();
     });
 
     t.test('create error', (t) => {

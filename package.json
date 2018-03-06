@@ -23,7 +23,7 @@
   },
   "scripts": {
     "test": "tape test/*.js",
-    "lint": "eslint index.js",
+    "lint": "eslint lib",
     "cover": "istanbul cover tape -- test/*.js"
   },
   "main": "./lib/index.js"

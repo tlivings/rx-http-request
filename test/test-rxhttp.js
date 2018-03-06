@@ -5,8 +5,11 @@
 const Test = require('tape');
 const { RxHttpRequest, RxHttpsRequest } = require('../lib');
 const Nock = require('nock');
+const Debug = require('debug');
 
-Test('test reading', (t) => {
+const debug = Debug('rxhttpclient-test');
+
+Test('test request', (t) => {
 
     t.test('get', (t) => {
         t.plan(2);
@@ -24,7 +27,33 @@ Test('test reading', (t) => {
                 t.equal(body.hello, 'hello world');
             },
             (error) => {
-                console.error(error);
+                debug(`error: ${error.name}(${error.message})`);
+            },
+            () => {
+                t.pass();
+            }
+        );
+
+        request.complete();
+    });
+
+    t.test('get over ssl', (t) => {
+        t.plan(2);
+
+        Nock('https://example.com').get('/hello').reply(200, { hello: 'hello world' });
+
+        const request = new RxHttpsRequest({
+            method: 'GET',
+            hostname: 'example.com',
+            path: '/hello'
+        });
+
+        request.flatMap((response) => response).toArray().map((chunks) => JSON.parse(Buffer.concat(chunks))).subscribe(
+            (body) => {
+                t.equal(body.hello, 'hello world');
+            },
+            (error) => {
+                debug(`error: ${error.name}(${error.message})`);
             },
             () => {
                 t.pass();
@@ -50,7 +79,7 @@ Test('test reading', (t) => {
                 t.equal(response.raw.statusCode, 200);
             },
             (error) => {
-                console.error(error);
+                debug(`error: ${error.name}(${error.message})`);
             },
             () => {
                 t.pass();
@@ -77,6 +106,7 @@ Test('test reading', (t) => {
                 t.fail();
             },
             (error) => {
+                debug(`(expected) error: ${error.name}(${error.message})`);
                 t.pass();
             },
             () => {
@@ -89,3 +119,4 @@ Test('test reading', (t) => {
     });
 
 });
+
