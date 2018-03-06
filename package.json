@@ -12,6 +12,7 @@
     "node": ">= 8.0.0"
   },
   "dependencies": {
+    "debug": "^3.1.0",
     "rxjs": "^5.5.2"
   },
   "devDependencies": {
@@ -25,5 +26,5 @@
     "lint": "eslint index.js",
     "cover": "istanbul cover tape -- test/*.js"
   },
-  "main": "./index"
+  "main": "./lib/index.js"
 }

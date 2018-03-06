@@ -3,7 +3,7 @@
 
 
 const Test = require('tape');
-const { RxHttpRequest, RxHttpsRequest } = require('../index');
+const { RxHttpRequest, RxHttpsRequest } = require('../lib');
 
 Test('test request creation', (t) => {
 
